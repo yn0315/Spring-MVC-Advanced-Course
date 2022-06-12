@@ -1,5 +1,6 @@
-package com.study.springcore;
+package com.study.springcore.model;
 
+import com.study.springcore.dto.ProductRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Getter // get 함수를 일괄적으로 만들어줍니다.
 @NoArgsConstructor // 기본 생성자를 만들어줍니다.
 @Entity // DB 테이블 역할을 합니다.
-public class Product {
+public class Product {//클라이언트에 보내는 정보와 다를 수 있으므로 responseDto를 통해 보내는 게 일반적임
 
     // ID가 자동으로 생성 및 증가합니다.
     @GeneratedValue(strategy = GenerationType.AUTO)
