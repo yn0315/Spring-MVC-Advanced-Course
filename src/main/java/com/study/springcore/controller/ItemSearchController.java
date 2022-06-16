@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.springcore.dto.ItemDto;
+import com.study.springcore.service.ItemSearchService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,11 +23,27 @@ import java.util.List;
 @Controller
 public class ItemSearchController {
 
+    private final ItemSearchService itemSearchService;
+
+    @Autowired
+    public ItemSearchController(ItemSearchService itemSearchService) {
+        this.itemSearchService = itemSearchService;
+    }
+
+    @GetMapping("/api/search")
+    @ResponseBody
+    public List<ItemDto> getItems(@RequestParam String query) throws IOException {
+        List<ItemDto> itemDtoList = itemSearchService.getItems(query);
+
+        return itemDtoList;
+    }
+
     // Controller 가 자동으로 해주는 일
 // 1. API Request 의 파라미터 값에서 검색어 추출 -> query 변수
 // 5. API Response 보내기
 // 5.1) response 의 header 설정
 // 5.2) response 의 body 설정
+    /*
     @GetMapping("/api/search")
     @ResponseBody
     public List<ItemDto> getItems(@RequestParam String query) throws IOException {
@@ -52,4 +70,6 @@ public class ItemSearchController {
 
         return itemDtoList;
     }
+     */
+
 }
