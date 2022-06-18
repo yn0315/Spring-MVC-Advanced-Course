@@ -4,7 +4,12 @@ package com.study.springcore.repository;
 import com.study.springcore.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProductRepository extends JpaRepository<Product, Long> { }
+import java.util.List;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findAllByUserId(Long userId);
+}
+
 /*
     이 역할을 위에 한 줄이 대신해줌
 

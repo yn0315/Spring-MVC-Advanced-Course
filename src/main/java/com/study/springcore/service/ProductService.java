@@ -1,58 +1,51 @@
 package com.study.springcore.service;
 
-import com.study.springcore.model.Product;
 import com.study.springcore.dto.ProductMypriceRequestDto;
-import com.study.springcore.repository.ProductRepository;
 import com.study.springcore.dto.ProductRequestDto;
+import com.study.springcore.model.Product;
+import com.study.springcore.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.*;
 import java.util.List;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
+
+    @Autowired
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
-    public Product createProduct(ProductRequestDto requestDto) {
+
+    public Product createProduct(ProductRequestDto requestDto, Long userId ) {
 // 요청받은 DTO 로 DB에 저장할 객체 만들기
-        Product product = new Product(requestDto);
+        Product product = new Product(requestDto, userId);
 
         productRepository.save(product);
-        // = productRepository.createProduct(product);
 
         return product;
-    }//end createProduct
+    }
 
-    public Product updateProduct(Long id, ProductMypriceRequestDto requestDto) throws SQLException {
+    public Product updateProduct(Long id, ProductMypriceRequestDto requestDto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("해당 아이디가 존재하지 않습니다."));
 
-        // = Optional <Product> product = productRepository.findById(id);
-
-        // = Product product = productRepository.getProduct(id);
-
-        /*
-        if(product == null){
-            throw new NullPointerException("해당 아이디가 존재하지 않습니다.");
-        }
-         */
-        int myPrice = requestDto.getMyprice();
-        product.setMyprice(myPrice);
+        int myprice = requestDto.getMyprice();
+        product.setMyprice(myprice);
         productRepository.save(product);
-        // = productRepository.updateMyprice(id, requestDto.getMyprice());
 
         return product;
-    }//end updateProduct
+    }
 
-    public List<Product> getProducts(){
+    // 회원 ID 로 등록된 상품 조회
+    public List<Product> getProducts(Long userId) {
+        return productRepository.findAllByUserId(userId);
+    }
 
-        List<Product> products = productRepository.findAll();
-        // = List<Product> products = productRepository.getProducts();
-
-        return products;
-
+    //(관리자용) 상품 전체 조회
+   public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 }

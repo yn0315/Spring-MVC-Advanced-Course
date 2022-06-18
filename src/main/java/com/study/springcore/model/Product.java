@@ -1,5 +1,4 @@
 package com.study.springcore.model;
-
 import com.study.springcore.dto.ProductRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +10,12 @@ import javax.persistence.*;
 @Getter // get 함수를 일괄적으로 만들어줍니다.
 @NoArgsConstructor // 기본 생성자를 만들어줍니다.
 @Entity // DB 테이블 역할을 합니다.
-public class Product {//클라이언트에 보내는 정보와 다를 수 있으므로 responseDto를 통해 보내는 게 일반적임
+public class Product {
 
     // ID가 자동으로 생성 및 증가합니다.
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
-    private Long id;
+    private Long id;//pk
 
     // 반드시 값을 가지도록 합니다.
     @Column(nullable = false)
@@ -34,8 +33,13 @@ public class Product {//클라이언트에 보내는 정보와 다를 수 있으
     @Column(nullable = false)
     private int myprice;
 
+    @Column(nullable = false)
+    private Long userId;//회원테이블 id 저장을 위한 컬럼
+
     // 관심 상품 생성 시 이용합니다.
-    public Product(ProductRequestDto requestDto) {
+    public Product(ProductRequestDto requestDto, Long userId) {
+// 관심상품을 등록한 회원 Id 저장
+        this.userId = userId;
         this.title = requestDto.getTitle();
         this.image = requestDto.getImage();
         this.link = requestDto.getLink();
