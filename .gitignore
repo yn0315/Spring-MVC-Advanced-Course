@@ -4,9 +4,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-**/src/main/java/com/study/springcore/service/UserService
-**/src/main/java/com/study/springcore/service/KakaoUserService
-**/src/main/java/com/study/springcore/ItemSearchServlet
+src/main/java/com/study/springcore/service/UserService
+src/main/java/com/study/springcore/service/KakaoUserService
+src/main/java/com/study/springcore/ItemSearchServlet
 
 ### STS ###
 .apt_generated
