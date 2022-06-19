@@ -1,20 +1,21 @@
 package com.study.springcore.service;
 
 import com.study.springcore.dto.SignupRequestDto;
-import com.study.springcore.model.Users;
 import com.study.springcore.model.UserRoleEnum;
+import com.study.springcore.model.Users;
 import com.study.springcore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-
+//ctrl + alt + o -> 안 쓰는 임포트문 정리해줌
 @Service
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private static final String ADMIN_TOKEN = "AAABnv/xRVklrnYxKZ0aHgTBcXukeZygoC";
+
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -46,4 +47,6 @@ public class UserService {
         Users user = new Users(username, password, email, role);
         userRepository.save(user);
     }
+
+
 }
