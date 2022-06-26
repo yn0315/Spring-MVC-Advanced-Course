@@ -26,6 +26,8 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    //스프링시큐리티테스트
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // 스프링 시큐리티
     implementation 'org.springframework.boot:spring-boot-starter-security'
