@@ -2,34 +2,96 @@ package com.study.springcore.integration;
 
 import com.study.springcore.dto.ProductMypriceRequestDto;
 import com.study.springcore.dto.ProductRequestDto;
+import com.study.springcore.dto.SignupRequestDto;
 import com.study.springcore.model.Product;
+import com.study.springcore.model.Users;
+import com.study.springcore.model.UserRoleEnum;
 import com.study.springcore.service.ProductService;
-import com.study.springcore.dto.ProductMypriceRequestDto;
+import com.study.springcore.service.UserService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)//포트번호 겹칠 수 있으니까 랜덤으로 생성해서 씀
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ProductIntegrationTest {
-    @Autowired//SpringBootTest어노테이션 사용해서 의존성주입 가능하므로
+public class UserProductIntegrationTest {
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
     ProductService productService;
 
-    Long userId = 100L;
+    Long userId = null;
     Product createdProduct = null;
     int updatedMyPrice = -1;
 
     @Test
-    @Order(1)//테스트 순서 정할 수 있는 어노테이션
-    @DisplayName("신규 관심상품 등록")
+    @Order(1)
+    @DisplayName("회원 가입 정보 없이 상품 등록 시 에러발생")
     void test1() {
+// given
+        String title = "Apple <b>에어팟</b> 2세대 유선충전 모델 (MV7N2KH/A)";
+        String imageUrl = "https://shopping-phinf.pstatic.net/main_1862208/18622086330.20200831140839.jpg";
+        String linkUrl = "https://search.shopping.naver.com/gate.nhn?id=18622086330";
+        int lPrice = 77000;
+        ProductRequestDto requestDto = new ProductRequestDto(
+                title,
+                imageUrl,
+                linkUrl,
+                lPrice
+        );
+
+// when
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            productService.createProduct(requestDto, userId);
+        });
+
+// then
+        assertEquals("회원 Id 가 유효하지 않습니다.", exception.getMessage());
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("회원 가입")
+    void test2() {
+// given
+        String username = "르탄이";
+        String password = "nobodynoboy";
+        String email = "retan1@spartacodingclub.kr";
+        boolean admin = false;
+
+        SignupRequestDto signupRequestDto = new SignupRequestDto();
+        signupRequestDto.setUsername(username);
+        signupRequestDto.setPassword(password);
+        signupRequestDto.setEmail(email);
+        signupRequestDto.setAdmin(admin);
+
+// when
+        Users user = userService.registerUser(signupRequestDto);
+
+// then
+        assertNotNull(user.getId());
+        assertEquals(username, user.getUsername());
+        assertTrue(passwordEncoder.matches(password, user.getPassword()));
+        assertEquals(email, user.getEmail());
+        assertEquals(UserRoleEnum.USER, user.getRole());
+
+        userId = user.getId();
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("가입한 회원 Id 로 신규 관심상품 등록")
+    void test3() {
 // given
         String title = "Apple <b>에어팟</b> 2세대 유선충전 모델 (MV7N2KH/A)";
         String imageUrl = "https://shopping-phinf.pstatic.net/main_1862208/18622086330.20200831140839.jpg";
@@ -57,17 +119,15 @@ class ProductIntegrationTest {
     }
 
     @Test
-    @Order(2)
+    @Order(4)
     @DisplayName("신규 등록된 관심상품의 희망 최저가 변경")
-    void test2() {
+    void test4() {
 // given
         Long productId = this.createdProduct.getId();
         int myPrice = 70000;
         ProductMypriceRequestDto requestDto = new ProductMypriceRequestDto(myPrice);
-
 // when
         Product product = productService.updateProduct(productId, requestDto);
-
 // then
         assertNotNull(product.getId());
         assertEquals(userId, product.getUserId());
@@ -80,9 +140,9 @@ class ProductIntegrationTest {
     }
 
     @Test
-    @Order(3)
+    @Order(5)
     @DisplayName("회원이 등록한 모든 관심상품 조회")
-    void test3() {
+    void test5() {
 // given
         int page = 0;
         int size = 10;
@@ -99,7 +159,6 @@ class ProductIntegrationTest {
                 .filter(product -> product.getId().equals(createdProductId))
                 .findFirst()
                 .orElse(null);
-
 // 2. Order(1) 테스트에 의해 생성된 상품과 일치하는지 검증
         assertNotNull(foundProduct);
         assertEquals(userId, foundProduct.getUserId());
@@ -108,7 +167,6 @@ class ProductIntegrationTest {
         assertEquals(this.createdProduct.getImage(), foundProduct.getImage());
         assertEquals(this.createdProduct.getLink(), foundProduct.getLink());
         assertEquals(this.createdProduct.getLprice(), foundProduct.getLprice());
-
 // 3. Order(2) 테스트에 의해 myPrice 가격이 정상적으로 업데이트되었는지 검증
         assertEquals(this.updatedMyPrice, foundProduct.getMyprice());
     }

@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
 //ctrl + alt + o -> 안 쓰는 임포트문 정리해줌
 @Service
 public class UserService {
@@ -23,7 +24,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void registerUser(SignupRequestDto requestDto) {
+    public Users registerUser(SignupRequestDto requestDto) {//원래 void타입!, 에러나서 Users로 바꿈
 // 회원 ID 중복 확인
         String username = requestDto.getUsername();
         Optional<Users> found = userRepository.findByUsername(username);
@@ -46,6 +47,7 @@ public class UserService {
 
         Users user = new Users(username, password, email, role);
         userRepository.save(user);
+        return user;
     }
 
 

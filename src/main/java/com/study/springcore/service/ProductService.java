@@ -4,9 +4,11 @@ import com.study.springcore.dto.ProductRequestDto;
 import com.study.springcore.model.Product;
 import com.study.springcore.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ProductService {
@@ -44,12 +46,22 @@ public class ProductService {
     }
 
     // 회원 ID 로 등록된 상품 조회
-    public List<Product> getProducts(Long userId) {
-        return productRepository.findAllByUserId(userId);
+    //페이지 사용할 때 page<>로 만들어 줘야 함
+    public Page<Product> getProducts(Long userId, int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+                         //오름차 내림차, 무엇으로 정렬할 것인지 ↓
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findAllByUserId(userId, pageable);
     }
 
     // (관리자용) 상품 전체 조회
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public Page<Product> getAllProducts(int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findAll(pageable);
     }
 }
